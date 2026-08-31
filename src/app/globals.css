@@ -1,0 +1,329 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ---- Monolithic dark canvas -------------------------------------- */
+    /* One near-black ground. Surfaces are separated by hairlines, never by
+       a lighter fill — that is what keeps it reading as one solid object
+       instead of a stack of floating cards. */
+    --bg: #050505;
+    --bg-elevated: #08080a;
+
+    /* Razor-thin borders do all the structural work. */
+    --line: rgba(255, 255, 255, 0.08);
+    --line-hover: rgba(255, 255, 255, 0.2);
+    --line-strong: rgba(255, 255, 255, 0.14);
+
+    /* ---- Text --------------------------------------------------------- */
+    --fg: #ffffff; /* 20.38:1 on --bg */
+    /* Equivalent to text-white/70 composited over --bg. The previous #888888
+       measured 5.75:1 and read as grey-on-black; this lifts secondary copy to
+       ~10:1 while still sitting clearly below --fg. */
+    --fg-muted: #b4b4b4;
+    /* Tertiary tier: index numerals, meta labels, capability lists.
+       #5a5a5a looked better but measures 2.96:1 — a fail. #7a7a7a is close to
+       the darkest grey that still clears AA here, so this tier stays readable
+       wherever it ends up carrying real content. */
+    --fg-dim: #7a7a7a; /*  4.75:1 on --bg */
+
+    /* ---- Accent ------------------------------------------------------- */
+    /* Used sparingly: one element per viewport, at most. */
+    --accent: #00f0ff; /* 14.47:1 on --bg */
+    --on-accent: #050505; /* 14.47:1 on --accent */
+
+    --danger: #ff5c5c;
+    --success: #4ade80;
+
+    /*
+      Channel-only twins of the palette.
+      Tailwind's opacity modifiers (`bg-accent/5`, `via-accent/30`) compile to
+      `rgb(<channels> / <alpha>)`. A token holding a hex string cannot be given
+      an alpha that way, so `bg-accent/5` silently resolved to rgba(0,0,0,0) and
+      the section dividers rendered completely invisible. These exist so the
+      Tailwind colours can be declared as `rgb(var(--x-rgb) / <alpha-value>)`
+      while the hex vars above stay available to hand-written CSS.
+      Keep both in sync.
+    */
+    --accent-rgb: 0 240 255;
+    --on-accent-rgb: 5 5 5;
+    --fg-rgb: 255 255 255;
+    --fg-muted-rgb: 180 180 180;
+    --fg-dim-rgb: 122 122 122;
+    --bg-rgb: 5 5 5;
+    --bg-elevated-rgb: 8 8 10;
+    --danger-rgb: 255 92 92;
+    --success-rgb: 74 222 128;
+
+    /* ---- Texture ------------------------------------------------------ */
+    --grid-size: 80px;
+    --grid-line: rgba(255, 255, 255, 0.022);
+    --noise-opacity: 0.035;
+
+    --radius: 0px; /* sharp. every corner. */
+
+    --nav-h: 72px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /*
+      No scroll-padding-top here on purpose.
+      `scroll-padding-top` on the scroll container and `scroll-margin-top` on the
+      target ADD — they do not override one another. With 104px here and
+      `scroll-mt-24` (96px) on each section, a fragment jump landed the section
+      200px down and its heading at 475px, leaving 366px of empty screen under
+      the header. The offset now lives in exactly one place: `scroll-mt-24` on
+      the sections themselves (see SECTION_ANCHOR in lib/constants).
+    */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-size: 1rem;
+    line-height: 1.625; /* leading-relaxed */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'ss01', 'cv01';
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* ---- Bento surface ------------------------------------------------- */
+  /* No fill, no blur, no shadow. A hairline and an inner glow on hover. */
+  .bento {
+    position: relative;
+    /* `--card-border` is set by scroll-linked motion where a surface opts in
+       (see DemoCard). It has to be a variable rather than an inline style so
+       the :hover rule below can still win — an inline style could not be
+       overridden by a class. */
+    border: 1px solid var(--card-border, var(--line));
+    background-color: var(--bg-elevated);
+    transition:
+      border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* One hover contract for every interactive surface: accent border, 4px lift,
+     and the inner glow. Cards, panels and the demo grid all share it so nothing
+     on the page hovers differently from anything else. */
+  .bento-interactive {
+    transition:
+      border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bento-interactive:hover,
+  .bento-interactive:focus-visible,
+  .bento-interactive:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    transform: translateY(-4px);
+  }
+
+  /* ---- Pointer-tracked lighting ------------------------------------- */
+  /* Position comes from useSpotlight(). Two layers: a wide soft wash in the
+     accent, and a tight white core that reads as a specular highlight. Both
+     sit under the content and above the surface. */
+  .spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 400ms cubic-bezier(0.22, 1, 0.36, 1);
+    background:
+      radial-gradient(
+        260px circle at var(--mx, 50%) var(--my, 50%),
+        color-mix(in srgb, var(--accent) 9%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        90px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.05),
+        transparent 70%
+      );
+  }
+  .spotlight:hover::after,
+  .spotlight:focus-within::after {
+    opacity: 1;
+  }
+
+  /* ---- Rolling numeral ----------------------------------------------- */
+  /* The index slides up and an accent copy takes its place, rather than
+     cross-fading colour. Reads as a mechanical counter. */
+  .roll {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    height: 1em;
+  }
+  .roll > span {
+    display: block;
+    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .group:hover .roll > span,
+  .group:focus-visible .roll > span {
+    transform: translateY(-100%);
+  }
+
+  /* ---- Underline that draws ------------------------------------------ */
+  /* Replaces colour-only link hovers. Origin flips so it draws in from the
+     left and retracts to the right — a small thing that reads as considered. */
+  .draw-line {
+    position: relative;
+  }
+  .draw-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .draw-line:hover::after,
+  .draw-line:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -100%;
+    z-index: 100;
+    padding: 0.75rem 1.25rem;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  /* Hairline rule that matches the border language. */
+  .rule {
+    height: 1px;
+    background: var(--line);
+  }
+}
+
+@layer utilities {
+  /* ---- Fine grid ----------------------------------------------------- */
+  .bg-grid {
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        var(--grid-line) 0 1px,
+        transparent 1px var(--grid-size)
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--grid-line) 0 1px,
+        transparent 1px var(--grid-size)
+      );
+  }
+
+  /* ---- Noise --------------------------------------------------------- */
+  /* Inline SVG turbulence: no network request, no raster asset, and it
+     scales to any viewport without banding. */
+  .bg-noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--noise-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Radial fade so the grid dissolves instead of stopping at a hard edge. */
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+  .mask-fade-radial {
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 100%);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+/* Marquee for the capability ticker — pauses on hover and under reduced motion. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 38s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+  .shimmer::after {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --grid-size: 56px;
+  }
+}
