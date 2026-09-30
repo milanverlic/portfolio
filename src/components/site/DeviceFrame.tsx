@@ -99,6 +99,9 @@ export function DeviceFrame({
               onLoad={onLoad}
               loading="lazy"
               className="h-full w-full border-0"
+              // Scrolling inside a demo must not drive the parent page. Lenis
+              // reads this and leaves wheel events over the frame alone.
+              data-lenis-prevent
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             />
           </div>

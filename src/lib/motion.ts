@@ -45,7 +45,12 @@ export const exitFactor = 0.65;
  * whole page arrives with a single rhythm instead of each component inventing
  * its own. Used by <Reveal>, the section wrappers and the card grids.
  */
-export const SECTION_EASE = [0.21, 0.47, 0.32, 0.98] as const;
+/**
+ * Expo-out. Leaves fast and lands slowly, so a reveal reads as arriving rather
+ * than as sliding. Deliberately the same curve as MASK_EASE in lib/scroll.ts
+ * and as the Lenis wheel easing, so scrolling and revealing share one feel.
+ */
+export const SECTION_EASE = [0.16, 1, 0.3, 1] as const;
 export const SECTION_DURATION = 0.5;
 export const SECTION_VIEWPORT = { once: true, margin: '-80px' } as const;
 
@@ -71,6 +76,40 @@ export function sectionReveal(reduced: boolean, delay = 0) {
 }
 
 /** Parent for staggered lists — process steps, stat rows, card grids. */
+/* ---- FadeIn tokens ------------------------------------------------------
+ * Slightly longer and travelling slightly further than the older reveal
+ * (0.6s / 40px vs 0.5s / 30px), so the whole page shares one rhythm now that
+ * <FadeIn> is the only reveal component.
+ */
+export const FADE_DURATION = 0.6;
+export const FADE_DISTANCE = 40;
+
+export type FadeDirection = 'up' | 'down' | 'left' | 'right';
+
+/** Offset the element starts from. The name is the direction it travels. */
+export function fadeInitial(direction: FadeDirection = 'up') {
+  return {
+    opacity: 0,
+    y: direction === 'up' ? FADE_DISTANCE : direction === 'down' ? -FADE_DISTANCE : 0,
+    x: direction === 'left' ? FADE_DISTANCE : direction === 'right' ? -FADE_DISTANCE : 0,
+  };
+}
+
+export const fadeTarget = { opacity: 1, y: 0, x: 0 } as const;
+
+/**
+ * Reduced motion collapses the duration to 0 rather than removing the
+ * animation, so the element snaps to its final state. Same markup either way —
+ * see the note at the top of this file for why that distinction matters.
+ */
+export function makeFadeTransition(reduced: boolean, delay = 0): Transition {
+  return {
+    duration: reduced ? 0 : FADE_DURATION,
+    delay: reduced ? 0 : delay,
+    ease: SECTION_EASE,
+  };
+}
+
 export function makeStaggerParent(reduced: boolean, step = STAGGER_STEP): Variants {
   return {
     hidden: {},

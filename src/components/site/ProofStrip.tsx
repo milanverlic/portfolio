@@ -1,6 +1,6 @@
 'use client';
 
-import { Reveal } from '@/components/ui/Reveal';
+import { FadeIn } from '@/components/FadeIn';
 import { useLanguage } from '@/context/LanguageContext';
 
 const STATS = [
@@ -29,7 +29,7 @@ export function ProofStrip() {
       <div className="mx-auto max-w-wide px-6 md:px-10 lg:px-16">
         <dl className="grid grid-cols-2 md:grid-cols-4">
           {STATS.map((stat, i) => (
-            <Reveal
+            <FadeIn
               key={t.proof.stats[i]}
               delay={i * 0.06}
               className={`border-line py-10 md:py-14 ${
@@ -45,7 +45,7 @@ export function ProofStrip() {
               <dt className="mt-4 max-w-[22ch] text-[0.8125rem] leading-snug text-muted">
                 {t.proof.stats[i]}
               </dt>
-            </Reveal>
+            </FadeIn>
           ))}
         </dl>
       </div>

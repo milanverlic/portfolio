@@ -1,10 +1,10 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import type { Demo } from '@/lib/demos';
-import { makeStaggerChild } from '@/lib/motion';
+import { FadeIn } from '@/components/FadeIn';
 import { SCROLL_SPRING, useScrollMotion } from '@/lib/scroll';
 import { DemoPreview } from './DemoPreview';
 import { useLanguage } from '@/context/LanguageContext';
@@ -39,7 +39,6 @@ export function DemoCard({
   onOpen: () => void;
   className?: string;
 }) {
-  const reduced = useReducedMotion() ?? false;
   const { t, fill } = useLanguage();
   const copy = t.demos[demo.slug];
 
@@ -63,16 +62,21 @@ export function DemoCard({
   );
 
   return (
-    <motion.article
-      ref={cardRef}
-      variants={makeStaggerChild(reduced)}
-      className={className}
-      style={{ scale: scrollMotion ? scale : 1 }}
-    >
+    // FadeIn is the grid child and carries the column span, so the entrance
+    // (opacity + y) sits on a different element from the scroll-linked scale
+    // below. Both would otherwise write `transform` on one node and the last
+    // writer would win.
+    <FadeIn as="article" className={className} delay={index * 0.15}>
       <motion.div
+        ref={cardRef}
         className="h-full"
-        style={{ ['--card-border' as string]: scrollMotion ? borderColor : 'var(--line)' }}
+        // Same reasoning as the hero: scroll-linked, so the layer is kept.
+        style={{ scale: scrollMotion ? scale : 1, willChange: scrollMotion ? 'transform' : undefined }}
       >
+        <motion.div
+          className="h-full"
+          style={{ ['--card-border' as string]: scrollMotion ? borderColor : 'var(--line)' }}
+        >
         <button
           type="button"
           onClick={onOpen}
@@ -108,8 +112,9 @@ export function DemoCard({
               />
             </div>
           </div>
-        </button>
+          </button>
+        </motion.div>
       </motion.div>
-    </motion.article>
+    </FadeIn>
   );
 }

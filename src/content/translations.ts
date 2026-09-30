@@ -228,6 +228,11 @@ const en = {
     email: 'Email',
     backToTop: 'Back to top',
     note: 'The demos are real builds, not templates',
+    cvLabel: 'Résumé',
+    cvView: 'View CV',
+    cvClose: 'Close CV',
+    cvDownload: 'Download PDF',
+    cvAlt: 'Milan Verlić — curriculum vitae, one page',
   },
 
   a11y: {
@@ -443,6 +448,11 @@ const sr: Dictionary = {
     email: 'Email',
     backToTop: 'Nazad na vrh',
     note: 'Demoi su pravi sajtovi, ne šabloni',
+    cvLabel: 'Biografija',
+    cvView: 'Pogledaj CV',
+    cvClose: 'Zatvori CV',
+    cvDownload: 'Preuzmi PDF',
+    cvAlt: 'Milan Verlić — biografija, jedna strana',
   },
 
   a11y: {

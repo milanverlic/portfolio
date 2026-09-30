@@ -1,11 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { DEMOS, getDemo, type DemoSlug } from '@/lib/demos';
 import { SITE } from '@/lib/constants';
 import { useLanguage } from '@/context/LanguageContext';
-import { SECTION_VIEWPORT, makeStaggerParent } from '@/lib/motion';
 import { SectionHeading } from './SectionHeading';
 import { SectionDivider } from './SectionDivider';
 import { DemoCard } from './DemoCard';
@@ -96,13 +95,9 @@ export function DemoShowcase({ initialSlug }: { initialSlug?: DemoSlug }) {
           lead={t.work.lead}
         />
 
-        <motion.div
-          variants={makeStaggerParent(reduced)}
-          initial="hidden"
-          whileInView="visible"
-          viewport={SECTION_VIEWPORT}
-          className="grid grid-cols-1 gap-4 md:grid-cols-12"
-        >
+        {/* Each card now carries its own delay (index * 0.15), so the grid does
+            not need to orchestrate a variants stagger. */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
           {DEMOS.map((demo, i) => (
             <DemoCard
               key={demo.slug}
@@ -113,7 +108,7 @@ export function DemoShowcase({ initialSlug }: { initialSlug?: DemoSlug }) {
               className={i % 4 === 0 || i % 4 === 3 ? 'md:col-span-7' : 'md:col-span-5'}
             />
           ))}
-        </motion.div>
+        </div>
       </div>
 
       <DemoOverlay demo={activeDemo} onClose={close} />

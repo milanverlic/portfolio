@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useReducedMotion, type SpringOptions } from 'framer-motion';
+import { lenisScrollTo } from './lenis';
 
 /**
  * Shared configuration for scroll-linked motion.
@@ -48,7 +49,19 @@ export function scrollToSection(id: string): boolean {
   if (!el) return false;
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  el.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+
+  // Lenis owns the scroll position when it is running, so a native smooth
+  // scroll here would animate the same value from two places at once and
+  // visibly fight. lenisScrollTo returns false when Lenis is absent (reduced
+  // motion, or before mount), and the native path takes over unchanged.
+  //
+  // scrollIntoView honours scroll-margin-top; Lenis does not, so the existing
+  // scroll-mt-24 on each section is passed explicitly as a negative offset to
+  // keep both paths landing in the same place under the fixed header.
+  const marginTop = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+  if (!lenisScrollTo(el, -marginTop)) {
+    el.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+  }
 
   if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
   (el as HTMLElement).focus({ preventScroll: true });

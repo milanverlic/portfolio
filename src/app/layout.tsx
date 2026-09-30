@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Plus_Jakarta_Sans } from 'next/font/google';
 import { SITE } from '@/lib/constants';
 import { LanguageProvider } from '@/context/LanguageContext';
+import { SmoothScroll } from '@/components/SmoothScroll';
+import 'lenis/dist/lenis.css';
 import './globals.css';
 
 // Geist carries the display weight. Syne was here first and is the reason the
@@ -74,7 +76,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
       </head>
       <body className="font-body antialiased">
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <SmoothScroll>{children}</SmoothScroll>
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Reveal } from '@/components/ui/Reveal';
+import { FadeIn } from '@/components/FadeIn';
 import { SECTION_VIEWPORT, ease } from '@/lib/motion';
 import { MASK_DURATION, MASK_EASE, useScrollMotion } from '@/lib/scroll';
 import { Crosshair } from './SectionDivider';
@@ -41,7 +41,7 @@ export function SectionHeading({ index, eyebrow, title, lead, id }: Props) {
 
   return (
     <header className="mb-16 md:mb-24">
-      <Reveal>
+      <FadeIn>
         <div className="relative flex items-center justify-between pb-4 text-eyebrow uppercase">
           <span className="text-muted">{eyebrow}</span>
           <span className="tnum text-dim">{index}</span>
@@ -70,7 +70,7 @@ export function SectionHeading({ index, eyebrow, title, lead, id }: Props) {
             <Crosshair className="right-0" />
           </motion.span>
         </div>
-      </Reveal>
+      </FadeIn>
 
       <div className="mt-10 grid gap-8 md:grid-cols-12 md:gap-12">
         <div className="md:col-span-7">
@@ -90,9 +90,9 @@ export function SectionHeading({ index, eyebrow, title, lead, id }: Props) {
         </div>
 
         {lead && (
-          <Reveal delay={0.12} className="md:col-span-5 md:pt-2">
+          <FadeIn delay={0.12} className="md:col-span-5 md:pt-2">
             <p className="max-w-measure text-body leading-relaxed text-muted">{lead}</p>
-          </Reveal>
+          </FadeIn>
         )}
       </div>
     </header>

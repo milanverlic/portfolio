@@ -1,6 +1,6 @@
 'use client';
 
-import { Reveal } from '@/components/ui/Reveal';
+import { FadeIn } from '@/components/FadeIn';
 import { SectionHeading } from './SectionHeading';
 import { SectionDivider } from './SectionDivider';
 import { SITE } from '@/lib/constants';
@@ -42,7 +42,7 @@ export function About() {
 
         <div className="grid gap-4 md:grid-cols-12">
           {/* Statement — the section's anchor, no portrait needed. */}
-          <Reveal className="md:col-span-7">
+          <FadeIn className="md:col-span-7">
             <div className="bento flex h-full flex-col justify-between p-7 md:p-10">
               <p className="max-w-measure text-balance font-display text-[clamp(1.35rem,2.2vw,1.9rem)] font-bold uppercase leading-[1.1] tracking-[-0.03em] text-fg">
                 {t.about.statement}
@@ -54,10 +54,10 @@ export function About() {
                 {SITE.name} — {t.about.body2}
               </p>
             </div>
-          </Reveal>
+          </FadeIn>
 
           {/* Code block */}
-          <Reveal delay={0.06} className="md:col-span-5">
+          <FadeIn delay={0.06} className="md:col-span-5">
             <div className="bento h-full overflow-hidden">
               <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                 <span className="font-mono text-eyebrow uppercase text-dim">baseline.ts</span>
@@ -82,12 +82,12 @@ export function About() {
                 </code>
               </pre>
             </div>
-          </Reveal>
+          </FadeIn>
 
           {t.about.traits.map((trait, i) => (
-            <Reveal key={trait.label} delay={0.12 + i * 0.06} className="md:col-span-4">
+            <FadeIn key={trait.label} delay={0.12 + i * 0.06} className="md:col-span-4">
               <TraitCard n={`0${i + 1}`} label={trait.label} value={trait.value} />
-            </Reveal>
+            </FadeIn>
           ))}
         </div>
       </div>

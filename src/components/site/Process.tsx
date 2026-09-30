@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { Reveal } from '@/components/ui/Reveal';
+import { FadeIn } from '@/components/FadeIn';
 import { SectionHeading } from './SectionHeading';
 import { SectionDivider } from './SectionDivider';
 import { useLanguage } from '@/context/LanguageContext';
@@ -62,7 +62,7 @@ export function Process() {
 
           <ol ref={listRef} className="border-t border-line">
             {t.process.steps.map((step, i) => (
-            <Reveal as="li" key={step.title} delay={i * 0.06}>
+            <FadeIn as="li" key={step.title} delay={i * 0.06}>
               <div className="group relative grid grid-cols-12 items-baseline gap-x-6 gap-y-3 border-b border-line py-8 md:py-10">
                 {/* An accent rule draws along the row's own baseline instead of
                     the row tinting its background. */}
@@ -92,7 +92,7 @@ export function Process() {
                   {step.meta}
                 </span>
                 </div>
-              </Reveal>
+              </FadeIn>
             ))}
           </ol>
         </div>

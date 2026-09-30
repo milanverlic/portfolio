@@ -4,6 +4,7 @@ import { ArrowUp } from '@phosphor-icons/react';
 import { useLanguage } from '@/context/LanguageContext';
 import { GMAIL_COMPOSE, SITE, SOCIALS, externalLinkProps } from '@/lib/constants';
 import { handleSectionClick } from '@/lib/scroll';
+import { CvPreview } from './CvPreview';
 
 export function Footer() {
   const { t } = useLanguage();
@@ -17,6 +18,7 @@ export function Footer() {
               <span className="text-accent">.</span>
             </p>
             <p className="mt-3 max-w-[34ch] text-[0.9375rem] leading-relaxed text-muted">{t.hero.headline}</p>
+            <CvPreview />
           </div>
 
           <nav aria-label="Footer" className="md:col-span-6 md:justify-self-end">

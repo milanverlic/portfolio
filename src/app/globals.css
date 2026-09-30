@@ -327,3 +327,20 @@
     --grid-size: 56px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Lenis overrides.
+
+   lenis.css ships `.lenis.lenis-smooth iframe { pointer-events: none }` so a
+   wheel event over an iframe cannot desync the parent's scroll position. On
+   this site that would disable the demo previews entirely — clicking through a
+   live demo is the whole point of the work section — so pointer events are
+   handed back. The iframes themselves carry `data-lenis-prevent`, which keeps
+   their internal scrolling from driving the page.
+
+   The extra `html` raises specificity above the vendor rule regardless of
+   stylesheet order.
+   --------------------------------------------------------------------------- */
+html.lenis.lenis-smooth iframe {
+  pointer-events: auto;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Reveal } from '@/components/ui/Reveal';
+import { FadeIn } from '@/components/FadeIn';
 import { SectionHeading } from './SectionHeading';
 import { SectionDivider } from './SectionDivider';
 import { ContactForm } from './ContactForm';
@@ -29,11 +29,11 @@ export function Contact() {
         />
 
         <div className="grid gap-4 lg:grid-cols-12">
-          <Reveal className="lg:col-span-7">
+          <FadeIn className="lg:col-span-7">
             <ContactForm />
-          </Reveal>
+          </FadeIn>
 
-          <Reveal delay={0.08} className="lg:col-span-5">
+          <FadeIn delay={0.08} className="lg:col-span-5">
             <div className="grid h-full gap-4">
               <SpotlightPanel className="p-7">
                 <span className="text-eyebrow uppercase text-dim">{t.contact.directLabel}</span>
@@ -89,7 +89,7 @@ export function Contact() {
                 </ul>
               </SpotlightPanel>
             </div>
-          </Reveal>
+          </FadeIn>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 'use client';
 
+import { setLenisActive } from './lenis';
 import { useEffect, type RefObject } from 'react';
 
 const FOCUSABLE = [
@@ -85,10 +86,15 @@ export function useScrollLock(active: boolean) {
 
     body.style.overflow = 'hidden';
     if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+    // Lenis keeps animating against a page that can no longer move, so its
+    // internal position drifts from the real one and the page jumps when the
+    // lock lifts. Pausing keeps the two in agreement.
+    setLenisActive(false);
 
     return () => {
       body.style.overflow = prevOverflow;
       body.style.paddingRight = prevPadding;
+      setLenisActive(true);
     };
   }, [active]);
 }

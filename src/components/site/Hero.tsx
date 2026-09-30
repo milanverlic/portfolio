@@ -108,7 +108,10 @@ export function Hero() {
       <motion.div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 -top-[15%] h-[130%]"
-        style={{ y: scrollMotion ? backdropY : 0 }}
+        // Promoted for the whole scroll, not per-animation: this transform is
+        // rewritten on every frame the user scrolls, so letting the layer be
+        // torn down and rebuilt between frames is the expensive option.
+        style={{ y: scrollMotion ? backdropY : 0, willChange: scrollMotion ? 'transform' : undefined }}
       >
         <Backdrop fade="radial" />
       </motion.div>
@@ -144,6 +147,7 @@ export function Hero() {
             scale: scrollMotion ? headlineScale : 1,
             opacity: scrollMotion ? headlineOpacity : 1,
             transformOrigin: 'left top',
+            willChange: scrollMotion ? 'transform, opacity' : undefined,
           }}
         >
           <span className="sr-only">
